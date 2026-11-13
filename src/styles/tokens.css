@@ -1,0 +1,45 @@
+/* ConGanizer – Design-Tokens (immer dunkel). Grundton Petrol, Akzent Weinrot. */
+:root {
+  /* Flächen */
+  --bg: #0f1e21;
+  --surface: #1a3237;
+  --surface-2: #213d43;
+  --surface-sunken: #132629;
+  --border: #24434b;
+  --border-strong: #35606a;
+
+  /* Text */
+  --text: #e8f0f1;
+  --text-muted: #9bb3b7;
+  --text-faint: #6c878c;
+
+  /* Akzent (Weinrot) */
+  --accent: #861845;
+  --accent-hover: #9c1f52;
+  --accent-bright: #e0628f;
+  --accent-soft: rgba(134, 24, 69, 0.22);
+  --on-accent: #ffffff;
+
+  /* Signalfarben */
+  --success: #4cc38a;
+  --warning: #f0a03c;
+  --danger: #ff6b6b;
+  --info: #5aa9f0;
+
+  /* Con-Status */
+  --status-interessant: #8aa2a6;
+  --status-beworben: #5aa9f0;
+  --status-warteliste: #f0a03c;
+  --status-angenommen: #4cc38a;
+  --status-abgelehnt: #7d8f92;
+  --status-abgesagt: #6c7d80;
+
+  /* Form */
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 18px;
+  --shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
