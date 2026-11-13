@@ -9,7 +9,7 @@ import { conDays, formatWeekdayDate, todayIso } from '../../../domain/dates';
 import { InlineAdd, ProgressBar } from '../../../ui/common';
 import { useConContext } from '../ConLayout';
 
-function ItemList({ items, ctx, editing }: { items: ChecklistItem[]; ctx: AutoContext; editing: boolean }) {
+export function ItemList({ items, ctx, editing }: { items: ChecklistItem[]; ctx: AutoContext; editing: boolean }) {
   return (
     <div>
       {items.map((item) => {

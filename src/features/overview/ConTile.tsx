@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Clock } from 'lucide-react';
+import { Clock, Star } from 'lucide-react';
 import type { Con, Hotel, IsoDate } from '../../db/types';
 import { daysUntil, formatDate, formatRange, relativeDays } from '../../domain/dates';
 import { nextDeadline } from '../../domain/deadlines';
@@ -19,6 +19,16 @@ export function ConTile({ con, hotels, today }: { con: Con; hotels: Hotel[]; tod
         <div>
           <StatusBadge status={con.status} />
         </div>
+        {(con.rating || con.reapply) && (
+          <div className="tile-deadline">
+            {con.rating ? (
+              <>
+                <Star size={12} fill="currentColor" style={{ color: 'var(--warning)' }} /> {con.rating}
+              </>
+            ) : null}
+            {con.reapply && <span>{con.rating ? ' · ' : ''}wieder: {con.reapply}</span>}
+          </div>
+        )}
         {deadline && (
           <div className={`tile-deadline ${soon ? 'soon' : ''}`} title={formatDate(deadline.date)}>
             <Clock size={13} />

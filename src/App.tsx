@@ -8,7 +8,8 @@ import { TripsTab } from './features/convention/tabs/TripsTab';
 import { PackTab } from './features/convention/tabs/PackTab';
 import { CashTab } from './features/convention/tabs/CashTab';
 import { ChecklistTab } from './features/convention/tabs/ChecklistTab';
-import { PlaceholderTab } from './features/convention/tabs/PlaceholderTab';
+import { ImagesTab } from './features/convention/tabs/ImagesTab';
+import { SettlementTab } from './features/convention/tabs/SettlementTab';
 import { LogbookPage } from './features/trips/LogbookPage';
 import { SettingsPage } from './features/settings/SettingsPage';
 
@@ -29,8 +30,8 @@ export function App() {
             <Route path="packliste" element={<PackTab />} />
             <Route path="kasse" element={<CashTab />} />
             <Route path="checkliste" element={<ChecklistTab />} />
-            <Route path="bilder" element={<PlaceholderTab title="Referenzbilder" milestone={3} />} />
-            <Route path="abrechnung" element={<PlaceholderTab title="Abrechnung" milestone={3} />} />
+            <Route path="bilder" element={<ImagesTab />} />
+            <Route path="abrechnung" element={<SettlementTab />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

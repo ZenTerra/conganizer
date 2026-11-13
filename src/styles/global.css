@@ -1001,3 +1001,165 @@ details.day[open] > summary {
   background: var(--surface-sunken);
   font-size: 16px;
 }
+
+/* ------------------------------------------------------------------ Bilder */
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+}
+@media (min-width: 760px) {
+  .gallery {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+}
+.thumb {
+  position: relative;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface-sunken);
+  cursor: pointer;
+}
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.thumb-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 14px 6px 4px;
+  font-size: 0.72rem;
+  text-align: left;
+  color: #fff;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(5, 12, 14, 0.97);
+  display: flex;
+  flex-direction: column;
+  padding: var(--safe-top) 0 var(--safe-bottom);
+}
+.lightbox-bar,
+.lightbox-caption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+}
+.lightbox-stage {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+.lightbox-stage img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 64px;
+  border: none;
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.lightbox-nav.left {
+  left: 8px;
+}
+.lightbox-nav.right {
+  right: 8px;
+}
+.lightbox-caption .input {
+  flex: 1;
+}
+.copy-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.copy-row:last-child {
+  border-bottom: none;
+}
+.copy-row .label {
+  flex: 1;
+  min-width: 0;
+}
+.copy-row .label small {
+  display: block;
+  color: var(--text-faint);
+  font-size: 0.78rem;
+}
+.copy-row .value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.stars {
+  display: flex;
+  gap: 4px;
+}
+.stars button {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--text-faint);
+}
+.stars button.on {
+  color: var(--warning);
+}
+.deadline-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.deadline-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.92rem;
+}
+.deadline-item:last-child {
+  border-bottom: none;
+}
+.deadline-item:hover {
+  text-decoration: none;
+}
+.deadline-item .when {
+  white-space: nowrap;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.deadline-item.soon .when {
+  color: var(--warning);
+  font-weight: 600;
+}

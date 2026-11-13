@@ -190,6 +190,8 @@ export interface ConImage extends Base {
   caption?: string;
   width: number;
   height: number;
+  /** Zeitpunkt des Hinzufügens (für stabile Reihenfolge) */
+  createdAt?: number;
 }
 
 /** Key-Value-Einstellungen; `id` ist der Schlüssel. */

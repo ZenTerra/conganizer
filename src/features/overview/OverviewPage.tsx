@@ -13,6 +13,7 @@ import { OpenTripBanner } from '../trips/TripParts';
 import { editTripState, TripSheet, type TripSheetState } from '../trips/TripSheet';
 import { EmptyState } from '../../ui/common';
 import { ConTile } from './ConTile';
+import { DeadlineBar } from './DeadlineBar';
 
 type Filter = 'alle' | ConStatus;
 
@@ -87,6 +88,8 @@ export function OverviewPage() {
                 </button>
               ))}
             </div>
+
+            <DeadlineBar cons={cons} hotelsByCon={hotelsByCon} today={today} />
 
             <h2 className="section-title">Kommende Cons</h2>
             {upcoming.length === 0 ? (

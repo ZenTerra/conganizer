@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarClock, MapPin } from 'lucide-react';
+import { CalendarClock, CalendarPlus, MapPin } from 'lucide-react';
+import { exportDeadlines } from '../../overview/DeadlineBar';
 import { db } from '../../../db/db';
 import { useConRecords } from '../../../db/hooks';
 import { updateRecord } from '../../../db/repo';
@@ -14,6 +15,7 @@ import { linkify } from '../../../domain/text';
 import { ConCover } from '../../../ui/common';
 import { Checkbox } from '../../../ui/fields';
 import { useConContext } from '../ConLayout';
+import { ReviewCard } from '../ReviewCard';
 
 function KV({ rows }: { rows: [string, ReactNode][] }) {
   const visible = rows.filter(([, v]) => v !== undefined && v !== null && v !== '' && v !== false);
@@ -105,6 +107,13 @@ export function OverviewTab() {
           <div className="card-header">
             <CalendarClock size={20} className="muted" />
             <h2>Fristen</h2>
+            <button
+              className="btn ghost small"
+              onClick={() => exportDeadlines(deadlines.filter((d) => d.date >= today), `${con.name}-Fristen`)}
+              disabled={!deadlines.some((d) => d.date >= today)}
+            >
+              <CalendarPlus size={16} /> Kalender
+            </button>
           </div>
           <ul className="list-plain">
             {deadlines.map((d) => {
@@ -185,6 +194,8 @@ export function OverviewTab() {
           )}
         </section>
       </div>
+
+      {(untilStart <= 0 || con.rating || con.lessons || con.reapply) && <ReviewCard con={con} />}
 
       {con.notes && (
         <section className="card">

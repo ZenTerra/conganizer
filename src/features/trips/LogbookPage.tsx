@@ -2,11 +2,13 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { ArrowLeft, Car, Play } from 'lucide-react';
-import { useAllTrips, useCons } from '../../db/hooks';
+import { ArrowLeft, Car, FileDown, FileSpreadsheet, Play } from 'lucide-react';
+import { useAllTrips, useCons, useSettings } from '../../db/hooks';
 import type { Trip } from '../../db/types';
 import { parseIso } from '../../domain/dates';
 import { formatKm, kmTotals, openTrip, sortTrips } from '../../domain/trips';
+import { shareFile, textFile } from '../../domain/share';
+import { tripsToCsv, tripsToPdf } from '../../domain/tripExport';
 import { EmptyState } from '../../ui/common';
 import { OpenTripBanner, TripCard, TripTransferView } from './TripParts';
 import { editTripState, newTripDraft, TripSheet, type TripSheetState } from './TripSheet';
@@ -20,6 +22,8 @@ export function LogbookPage() {
   const [sheet, setSheet] = useState<TripSheetState | null>(null);
   const [view, setView] = useState<View>('liste');
   const [onlyOpen, setOnlyOpen] = useState(false);
+  const settings = useSettings();
+  const [exporting, setExporting] = useState(false);
 
   const conNames = useMemo(() => new Map((cons ?? []).map((c) => [c.id, c.name])), [cons]);
   const year = String(new Date().getFullYear());
@@ -41,6 +45,21 @@ export function LogbookPage() {
   }, [trips, onlyOpen, year]);
 
   if (!trips) return null;
+
+  async function exportList(kind: 'pdf' | 'csv') {
+    setExporting(true);
+    try {
+      const title = onlyOpen ? 'nicht übertragen' : 'alle Fahrten';
+      const base = `Fahrtenbuch_${new Date().toISOString().slice(0, 10)}`;
+      const file =
+        kind === 'csv'
+          ? textFile(tripsToCsv(transferList), `${base}.csv`, 'text/csv')
+          : new File([await tripsToPdf(transferList, title, settings?.kmRate ?? 30)], `${base}.pdf`, { type: 'application/pdf' });
+      await shareFile(file, { title: base });
+    } finally {
+      setExporting(false);
+    }
+  }
 
   return (
     <>
@@ -99,7 +118,17 @@ export function LogbookPage() {
             </div>
 
             {view === 'uebertragen' ? (
-              <TripTransferView trips={transferList} />
+              <>
+                <div className="row">
+                  <button className="btn small" disabled={exporting || transferList.length === 0} onClick={() => exportList('pdf')}>
+                    <FileDown size={16} /> PDF
+                  </button>
+                  <button className="btn small" disabled={exporting || transferList.length === 0} onClick={() => exportList('csv')}>
+                    <FileSpreadsheet size={16} /> CSV
+                  </button>
+                </div>
+                <TripTransferView trips={transferList} />
+              </>
             ) : (
               [...byMonth.entries()].map(([month, list]) => (
                 <div key={month} className="stack">

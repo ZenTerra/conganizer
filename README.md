@@ -38,5 +38,5 @@ Der Repo-Name muss `conganizer` lauten, sonst `base` in `vite.config.ts` anpasse
 
 1. ✅ Grundgerüst, PWA, Übersicht, Con anlegen/bearbeiten, Status, Fristen, Hotel, Einstellungen
 2. ✅ Fahrtenbuch (km-Stand, Start/Ende, Übertragungsansicht fürs Papierbuch), Kasse mit Kassenbericht (Avery 305), Checklisten, Packliste, Vorlagen-Editor
-3. Bilder, Abrechnung, Gewinn pro Con, Fristen-Leiste + Kalender-Export, Nachbereitung
+3. ✅ Referenzbilder, Abrechnungs-Spickzettel für Accountable (Verpflegungspauschale, km-Pauschale, Fahrtenbuch als PDF/CSV), Gewinn pro Con, sonstige Ausgaben, Fristen-Leiste + Kalender-Export (.ics), Nachbereitung
 4. Backup & Abgleich zwischen Geräten, Duplizieren fürs nächste Jahr, Feinschliff
