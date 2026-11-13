@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { requestPersistentStorage } from '../../db/db';
@@ -8,6 +8,7 @@ import type { AppSettings } from '../../db/types';
 import { MoneyField, TextField } from '../../ui/fields';
 import { Toast } from '../../ui/common';
 import { ChecklistTemplateEditor, PackTemplateEditor } from './TemplateEditor';
+import { BackupSection } from '../backup/BackupUi';
 
 type Editable = Pick<AppSettings, 'homeAddress' | 'kmRate' | 'mealRatePartial' | 'mealRateFull'>;
 
@@ -15,16 +16,19 @@ export function SettingsPage() {
   const settings = useSettings();
   const navigate = useNavigate();
   const [draft, setDraft] = useState<Editable | null>(null);
+  const [dirty, setDirty] = useState(false);
   const [persisted, setPersisted] = useState<boolean | null>(null);
   const [usage, setUsage] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const clearToast = useCallback(() => setToast(null), []);
 
+  // Solange nichts ungespeichert ist, folgt das Formular der Datenbank (z. B. nach einem Import)
   useEffect(() => {
-    if (settings && !draft) {
+    if (settings && !dirty) {
       const { homeAddress, kmRate, mealRatePartial, mealRateFull } = settings;
       setDraft({ homeAddress, kmRate, mealRatePartial, mealRateFull });
     }
-  }, [settings, draft]);
+  }, [settings, dirty]);
 
   useEffect(() => {
     void (async () => {
@@ -35,14 +39,20 @@ export function SettingsPage() {
   }, []);
 
   if (!draft) return null;
-  const set = <K extends keyof Editable>(k: K, v: Editable[K]) => setDraft((d) => (d ? { ...d, [k]: v } : d));
+  const set = <K extends keyof Editable>(k: K, v: Editable[K]) => {
+    setDraft((d) => (d ? { ...d, [k]: v } : d));
+    setDirty(true);
+  };
 
   async function save() {
-    if (!draft) return;
-    await setSetting('homeAddress', draft.homeAddress.trim());
-    await setSetting('kmRate', draft.kmRate);
-    await setSetting('mealRatePartial', draft.mealRatePartial);
-    await setSetting('mealRateFull', draft.mealRateFull);
+    if (!draft || !settings) return;
+    // Nur Geändertes schreiben – sonst würden unveränderte Werte beim Abgleich „neuer“
+    const home = draft.homeAddress.trim();
+    if (home !== settings.homeAddress) await setSetting('homeAddress', home);
+    if (draft.kmRate !== settings.kmRate) await setSetting('kmRate', draft.kmRate);
+    if (draft.mealRatePartial !== settings.mealRatePartial) await setSetting('mealRatePartial', draft.mealRatePartial);
+    if (draft.mealRateFull !== settings.mealRateFull) await setSetting('mealRateFull', draft.mealRateFull);
+    setDirty(false);
     setToast('Einstellungen gespeichert');
   }
 
@@ -87,14 +97,19 @@ export function SettingsPage() {
           </div>
         </section>
 
-        <button className="btn primary block" onClick={save}>
+        <button className="btn primary block" onClick={save} disabled={!dirty}>
           Speichern
         </button>
 
+        <BackupSection onToast={setToast} />
+
         {settings && (
           <>
-            <PackTemplateEditor initial={settings.packTemplate} onSaved={() => setToast('Packlisten-Vorlage gespeichert')} />
+            <PackTemplateEditor
+              key={JSON.stringify(settings.packTemplate)}
+              initial={settings.packTemplate} onSaved={() => setToast('Packlisten-Vorlage gespeichert')} />
             <ChecklistTemplateEditor
+              key={JSON.stringify(settings.checklistTemplate)}
               initial={settings.checklistTemplate}
               onSaved={() => setToast('Checklisten-Vorlage gespeichert')}
             />
@@ -102,7 +117,7 @@ export function SettingsPage() {
         )}
 
         <section className="card">
-          <h2>Daten</h2>
+          <h2>Speicher</h2>
           <div className="row">
             {persisted ? (
               <ShieldCheck size={20} className="success-text" />
@@ -116,16 +131,13 @@ export function SettingsPage() {
             </span>
           </div>
           {usage && <span className="muted small">{usage}</span>}
-          <p className="muted small" style={{ margin: 0 }}>
-            Alle Daten liegen nur auf diesem Gerät. Backup &amp; Abgleich zwischen Geräten folgen mit Meilenstein 4.
-          </p>
         </section>
 
         <p className="faint small" style={{ textAlign: 'center' }}>
           ConGanizer {__APP_VERSION__}
         </p>
       </main>
-      <Toast message={toast} onDone={() => setToast(null)} />
+      <Toast message={toast} onDone={clearToast} />
     </>
   );
 }

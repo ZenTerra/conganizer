@@ -16,6 +16,7 @@ import { ConCover } from '../../../ui/common';
 import { Checkbox } from '../../../ui/fields';
 import { useConContext } from '../ConLayout';
 import { ReviewCard } from '../ReviewCard';
+import { SeriesCard } from '../SeriesCard';
 
 function KV({ rows }: { rows: [string, ReactNode][] }) {
   const visible = rows.filter(([, v]) => v !== undefined && v !== null && v !== '' && v !== false);
@@ -203,6 +204,7 @@ export function OverviewTab() {
           <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{con.notes}</p>
         </section>
       )}
+      <SeriesCard con={con} />
     </>
   );
 }

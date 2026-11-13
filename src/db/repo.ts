@@ -7,6 +7,7 @@ import type { Table } from 'dexie';
 import { CHILD_TABLES, db } from './db';
 import { DEFAULT_SETTINGS } from './templates';
 import { conDays } from '../domain/dates';
+import { nextYearDraft } from '../domain/duplicate';
 import type {
   AppSettings,
   Base,
@@ -196,4 +197,31 @@ export async function ensureDailyChecklist(
     })),
   );
   return addMissing(db.checklistItems, items);
+}
+
+// ---------------------------------------------------------------- Nächster Jahrgang
+
+/**
+ * Legt den nächsten Jahrgang einer Con an (frische Pack-/Checkliste aus den Vorlagen),
+ * übernimmt Titelbild und Hotels (als „nicht gebucht“, ohne Preis/Termine).
+ */
+export async function duplicateConForNextYear(conId: string): Promise<Con> {
+  const con = await db.cons.get(conId);
+  if (!con || con.deleted) throw new Error('Con nicht gefunden');
+  const created = await createCon(nextYearDraft(con));
+  await db.transaction('rw', [db.cons, db.images, db.hotels], async () => {
+    if (con.coverImageId) {
+      const img = await db.images.get(con.coverImageId);
+      if (img && !img.deleted) {
+        const { id: _i, updatedAt: _u, deleted: _d, ...rest } = img;
+        const copy = await createRecord(db.images, { ...rest, conId: created.id, createdAt: Date.now() });
+        await updateRecord(db.cons, created.id, { coverImageId: copy.id });
+      }
+    }
+    for (const h of alive(await db.hotels.where('conId').equals(conId).toArray())) {
+      if (!h.name && !h.address) continue;
+      await createRecord(db.hotels, { conId: created.id, booked: false, name: h.name, address: h.address, notes: h.notes });
+    }
+  });
+  return created;
 }

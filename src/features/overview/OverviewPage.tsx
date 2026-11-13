@@ -14,6 +14,7 @@ import { editTripState, TripSheet, type TripSheetState } from '../trips/TripShee
 import { EmptyState } from '../../ui/common';
 import { ConTile } from './ConTile';
 import { DeadlineBar } from './DeadlineBar';
+import { BackupBanner } from '../backup/BackupUi';
 
 type Filter = 'alle' | ConStatus;
 
@@ -69,6 +70,7 @@ export function OverviewPage() {
 
       <main className="page">
         <OpenTripBanner trip={running} onEnd={(t) => setSheet(editTripState(t))} />
+        <BackupBanner />
         {cons === undefined ? null : cons.length === 0 ? (
           <EmptyState icon={<CalendarHeart size={48} />} title="Noch keine Cons">
             <span>Leg deine erste Convention an – Status, Hotel und Fristen hast du dann auf einen Blick.</span>
