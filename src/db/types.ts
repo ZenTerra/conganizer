@@ -91,19 +91,40 @@ export interface Hotel extends Base {
 }
 
 export type TripKind = 'hin' | 'rueck' | 'pendel' | 'sonstig';
+/** Spalten „Gefahrene km“ im Fahrtenbuch: geschäftlich / Wohnung–Arbeit / privat */
+export type TripCategory = 'geschaeftlich' | 'wohnung' | 'privat';
+/** Uhrzeit `HH:mm` */
+export type TimeOfDay = string;
 
 export interface Trip extends Base {
+  /** '' = Fahrt ohne Con */
   conId: string;
   date: IsoDate;
+  startTime?: TimeOfDay;
+  endTime?: TimeOfDay;
   from: string;
   to: string;
   purpose: string;
+  /** km-Stand Fahrtbeginn / Fahrtende */
+  odoStart?: number;
+  odoEnd?: number;
+  /** Gefahrene km (aus km-Stand berechnet oder von Hand) */
   km: number;
   kind: TripKind;
+  category: TripCategory;
+  /** Kosten/Ausgaben (z. B. Benzin, Öl) – nur zum Übertragen, zählt nicht als Kosten */
+  costAmount?: Cents;
+  costPurpose?: string;
+  /** Ins Papier-Fahrtenbuch übertragen */
+  transferred: boolean;
 }
 
-export interface Withdrawal {
+/** Zeilen im Kassenbericht: Ausgaben je Kategorie bzw. sonstige Einnahmen */
+export type CashMovementType = 'wareneinkauf' | 'geschaeft' | 'privat' | 'sonstig' | 'einlage';
+
+export interface CashMovement {
   id: string;
+  type: CashMovementType;
   amount: Cents;
   note: string;
 }
@@ -111,16 +132,23 @@ export interface Withdrawal {
 /** Anzahl pro Stückelung, Schlüssel = Wert in Cent (z. B. "2000" für 20 €). */
 export type DenominationCount = Record<string, number>;
 
+/** Ein Kassentag; ID deterministisch `${conId}_cash_${date}`. */
 export interface CashDay extends Base {
   conId: string;
   date: IsoDate;
+  /** Kassenbericht-Nr. (fortlaufend über alle Cons) */
+  reportNo?: number;
+  /** Kassenbestand des Vortages (Tag 1: Wechselgeld) */
   start?: Cents;
+  /** Kassenbestand bei Geschäftsschluss */
   end?: Cents;
-  /** SumUp-Kartenumsatz des Tages */
+  /** SumUp-Kartenumsatz des Tages (nicht Teil des Kassenberichts) */
   card?: Cents;
-  withdrawals: Withdrawal[];
+  movements: CashMovement[];
   startCount?: DenominationCount;
   endCount?: DenominationCount;
+  /** In den Papier-Kassenbericht übertragen */
+  transferred: boolean;
 }
 
 export interface Expense extends Base {

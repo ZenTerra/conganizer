@@ -30,13 +30,13 @@ Der Repo-Name muss `conganizer` lauten, sonst `base` in `vite.config.ts` anpasse
 |---|---|
 | `src/db/` | Datenmodell (`types.ts`), Dexie-Schema, Repo-Schicht (einziger Schreibweg, setzt `updatedAt`/Tombstones), Vorlagen |
 | `src/domain/` | Reine Logik: Datum, Geld (Cent), Status, Fristen, Bilder, Karten-Links |
-| `src/features/` | Seiten: Übersicht, Con-Ansicht mit Tabs (`convention/` – nicht `con/`, das ist unter Windows ein reservierter Name), Einstellungen |
+| `src/features/` | Seiten: Übersicht, Con-Ansicht mit Tabs (`convention/` – nicht `con/`, das ist unter Windows ein reservierter Name), Fahrtenbuch (`trips/`), Einstellungen |
 | `src/ui/` | Formularfelder und gemeinsame Bausteine |
 | `src/styles/` | Design-Tokens (immer dunkel, Petrol + Weinrot) und globale Styles |
 
 ## Meilensteine
 
 1. ✅ Grundgerüst, PWA, Übersicht, Con anlegen/bearbeiten, Status, Fristen, Hotel, Einstellungen
-2. Fahrtenbuch, Kasse, Checklisten, Packliste
+2. ✅ Fahrtenbuch (km-Stand, Start/Ende, Übertragungsansicht fürs Papierbuch), Kasse mit Kassenbericht (Avery 305), Checklisten, Packliste, Vorlagen-Editor
 3. Bilder, Abrechnung, Gewinn pro Con, Fristen-Leiste + Kalender-Export, Nachbereitung
 4. Backup & Abgleich zwischen Geräten, Duplizieren fürs nächste Jahr, Feinschliff

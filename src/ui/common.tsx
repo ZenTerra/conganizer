@@ -81,3 +81,73 @@ export function Toast({ message, onDone }: { message: string | null; onDone: () 
     </div>
   ) : null;
 }
+
+/** Dialog: auf dem Handy als Bottom-Sheet, am Desktop zentriert. */
+export function Sheet({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+  return (
+    <div className="sheet-backdrop" onClick={onClose}>
+      <div className="sheet" role="dialog" aria-modal="true" aria-label={title} onClick={(e) => e.stopPropagation()}>
+        <div className="sheet-header">
+          <h2>{title}</h2>
+          <button className="btn ghost icon small" aria-label="Schließen" onClick={onClose}>
+            <X size={20} />
+          </button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+export function ProgressBar({ done, total, label }: { done: number; total: number; label?: string }) {
+  const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+  return (
+    <div className="stack" style={{ gap: 4 }}>
+      <div className="row small muted">
+        <span>{label}</span>
+        <span className="spacer" />
+        <span>
+          {done} / {total}
+        </span>
+      </div>
+      <div className={`progress ${total > 0 && done === total ? 'done' : ''}`} role="progressbar" aria-valuenow={pct}>
+        <div style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}
+
+/** Kleines Eingabefeld + Button zum Hinzufügen eines Listenpunkts. */
+export function InlineAdd({ placeholder, onAdd }: { placeholder: string; onAdd: (text: string) => void }) {
+  const [text, setText] = useState('');
+  const submit = () => {
+    const t = text.trim();
+    if (!t) return;
+    onAdd(t);
+    setText('');
+  };
+  return (
+    <form
+      className="inline-add"
+      onSubmit={(e) => {
+        e.preventDefault();
+        submit();
+      }}
+    >
+      <input value={text} placeholder={placeholder} onChange={(e) => setText(e.target.value)} />
+      <button type="submit" className="btn small" disabled={!text.trim()}>
+        Hinzufügen
+      </button>
+    </form>
+  );
+}

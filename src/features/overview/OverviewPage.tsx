@@ -1,13 +1,16 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { CalendarHeart, ChevronRight, Plus, Settings } from 'lucide-react';
+import { Car, CalendarHeart, ChevronRight, Plus, Settings } from 'lucide-react';
 import { db } from '../../db/db';
-import { useCons } from '../../db/hooks';
+import { useAllTrips, useCons } from '../../db/hooks';
 import { alive } from '../../db/repo';
 import { CON_STATUSES, type Con, type ConStatus, type Hotel } from '../../db/types';
 import { todayIso } from '../../domain/dates';
 import { STATUS_META } from '../../domain/status';
+import { openTrip } from '../../domain/trips';
+import { OpenTripBanner } from '../trips/TripParts';
+import { editTripState, TripSheet, type TripSheetState } from '../trips/TripSheet';
 import { EmptyState } from '../../ui/common';
 import { ConTile } from './ConTile';
 
@@ -17,6 +20,9 @@ export function OverviewPage() {
   const cons = useCons();
   const hotels = useLiveQuery(async () => alive(await db.hotels.toArray()), []);
   const [filter, setFilter] = useState<Filter>('alle');
+  const trips = useAllTrips();
+  const running = openTrip(trips ?? []);
+  const [sheet, setSheet] = useState<TripSheetState | null>(null);
   const today = todayIso();
 
   const hotelsByCon = useMemo(() => {
@@ -52,12 +58,16 @@ export function OverviewPage() {
           <img src={`${import.meta.env.BASE_URL}pwa-64x64.png`} alt="" />
           ConGanizer
         </h1>
+        <Link to="/fahrtenbuch" className="btn ghost icon" aria-label="Fahrtenbuch">
+          <Car size={22} />
+        </Link>
         <Link to="/einstellungen" className="btn ghost icon" aria-label="Einstellungen">
           <Settings size={22} />
         </Link>
       </header>
 
       <main className="page">
+        <OpenTripBanner trip={running} onEnd={(t) => setSheet(editTripState(t))} />
         {cons === undefined ? null : cons.length === 0 ? (
           <EmptyState icon={<CalendarHeart size={48} />} title="Noch keine Cons">
             <span>Leg deine erste Convention an – Status, Hotel und Fristen hast du dann auf einen Blick.</span>
@@ -117,6 +127,7 @@ export function OverviewPage() {
           <Plus size={20} /> Neue Con
         </Link>
       )}
+      {sheet && <TripSheet state={sheet} onClose={() => setSheet(null)} />}
     </>
   );
 }

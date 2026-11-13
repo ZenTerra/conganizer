@@ -314,7 +314,8 @@ textarea {
   min-height: 88px;
   resize: vertical;
 }
-.field input[type='date'] {
+.field input[type='date'],
+.field input[type='time'] {
   -webkit-appearance: none;
   appearance: none;
   color-scheme: dark;
@@ -698,4 +699,305 @@ details.archive > summary svg {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   font-size: 0.92rem;
+}
+
+/* ------------------------------------------------------------------ Sheet (Dialog) */
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.sheet {
+  width: 100%;
+  max-width: 640px;
+  max-height: 92dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-bottom: none;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 16px 16px calc(20px + var(--safe-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow);
+}
+.sheet-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sheet-header h2 {
+  flex: 1;
+}
+@media (min-width: 760px) {
+  .sheet-backdrop {
+    align-items: center;
+  }
+  .sheet {
+    border-radius: var(--radius-lg);
+    border-bottom: 1px solid var(--border-strong);
+    padding-bottom: 20px;
+  }
+}
+
+/* ------------------------------------------------------------------ Fortschritt */
+
+.progress {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+.progress > div {
+  height: 100%;
+  background: var(--accent-bright);
+  border-radius: 4px;
+  transition: width 0.25s;
+}
+.progress.done > div {
+  background: var(--success);
+}
+
+/* ------------------------------------------------------------------ Listen & Zeilen */
+
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.item-row:last-child {
+  border-bottom: none;
+}
+.item-row .check {
+  flex: 1;
+  min-width: 0;
+}
+.item-row .check span {
+  overflow-wrap: anywhere;
+}
+.item-row.done .check span {
+  color: var(--text-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--text-faint);
+}
+.tag-auto {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  color: var(--info);
+  background: color-mix(in srgb, var(--info) 15%, transparent);
+  white-space: nowrap;
+}
+.inline-add {
+  display: flex;
+  gap: 8px;
+}
+.inline-add input {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-sunken);
+  font-size: 16px;
+}
+
+details.day > summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+details.day > summary::-webkit-details-marker {
+  display: none;
+}
+details.day > summary .chev {
+  transition: transform 0.15s;
+  color: var(--text-muted);
+}
+details.day[open] > summary .chev {
+  transform: rotate(90deg);
+}
+details.day[open] > summary {
+  margin-bottom: 12px;
+}
+
+/* Fahrten */
+.trip-card {
+  cursor: pointer;
+  gap: 6px;
+}
+.trip-card.open {
+  border-color: var(--accent-bright);
+}
+.trip-route {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+@media (min-width: 760px) {
+  .quick-actions {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.big-number {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stat .label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.stat .value {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+/* Übertragungsansicht */
+.transfer-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.transfer-table th,
+.transfer-table td {
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+.transfer-table th {
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+.transfer-table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.transfer-table tr.transferred td {
+  color: var(--text-faint);
+}
+.only-desktop {
+  display: none;
+}
+@media (min-width: 900px) {
+  .only-desktop {
+    display: block;
+  }
+  .only-mobile {
+    display: none !important;
+  }
+}
+
+/* Kassenbericht */
+.report {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-variant-numeric: tabular-nums;
+}
+.report-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 0;
+  font-size: 0.92rem;
+}
+.report-row .op {
+  color: var(--text-faint);
+  width: 14px;
+  display: inline-block;
+}
+.report-row.sub {
+  padding-left: 16px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.report-row.total {
+  border-top: 1px solid var(--border-strong);
+  font-weight: 700;
+}
+.report-row.result {
+  border-top: 2px solid var(--accent-bright);
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--accent-bright);
+}
+.count-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
+}
+.count-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.count-grid input {
+  min-height: 40px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-sunken);
+  font-size: 16px;
+  width: 100%;
+}
+.movement {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.movement:last-child {
+  border-bottom: none;
+}
+.movement .amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.input-sm {
+  width: 80px;
+  min-height: 34px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-sunken);
+  font-size: 16px;
 }

@@ -1,6 +1,20 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { db } from './db';
-import { alive, createCon, createRecord, deleteCon, getSettings, listByCon, setSetting, updateRecord } from './repo';
+import {
+  alive,
+  cashDayId,
+  createCon,
+  createRecord,
+  dailyItemId,
+  deleteCon,
+  deleteRecord,
+  ensureCashDays,
+  ensureDailyChecklist,
+  getSettings,
+  listByCon,
+  setSetting,
+  updateRecord,
+} from './repo';
 import { DEFAULT_CHECKLIST_TEMPLATE, DEFAULT_PACK_TEMPLATE } from './templates';
 
 const baseCon = {
@@ -56,6 +70,28 @@ describe('repo', () => {
     await deleteCon(con.id);
     await updateRecord(db.cons, con.id, { name: 'Zombie' });
     expect((await db.cons.get(con.id))?.name).toBe('Test-Con');
+  });
+
+  it('legt Kassentage und Tagespunkte idempotent an und belebt Gelöschtes nicht wieder', async () => {
+    const con = await createCon(baseCon); // 3 Tage
+    const settings = await getSettings();
+    const dailyPerDay = settings.checklistTemplate.filter((t) => t.section === 'tag').length;
+
+    expect(await ensureCashDays(con)).toBe(3);
+    expect(await ensureCashDays(con)).toBe(0);
+    expect(await listByCon(db.cashDays, con.id)).toHaveLength(3);
+
+    expect(await ensureDailyChecklist(con, settings)).toBe(3 * dailyPerDay);
+    expect(await ensureDailyChecklist(con, settings)).toBe(0);
+
+    const firstDaily = dailyItemId(con.id, '2027-03-14', 0);
+    await deleteRecord(db.checklistItems, firstDaily);
+    await ensureDailyChecklist(con, settings);
+    expect((await db.checklistItems.get(firstDaily))?.deleted).toBe(1);
+
+    await deleteRecord(db.cashDays, cashDayId(con.id, '2027-03-15'));
+    await ensureCashDays(con);
+    expect(await listByCon(db.cashDays, con.id)).toHaveLength(2);
   });
 
   it('liefert Standard-Einstellungen und überschreibt gespeicherte Werte', async () => {

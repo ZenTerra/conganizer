@@ -183,3 +183,26 @@ export function Checkbox({
     </label>
   );
 }
+
+/** Uhrzeit (HH:mm) mit optionalem „Jetzt“-Button. */
+export function TimeField(
+  props: BaseProps & { value: string | undefined; onChange: (v: string | undefined) => void; onNow?: () => void },
+) {
+  return (
+    <Wrap {...props}>
+      <div className="row" style={{ flexWrap: 'nowrap' }}>
+        <input
+          type="time"
+          value={props.value ?? ''}
+          onChange={(e) => props.onChange(e.target.value || undefined)}
+          style={{ flex: 1, minWidth: 0 }}
+        />
+        {props.onNow && (
+          <button type="button" className="btn small" onClick={props.onNow}>
+            Jetzt
+          </button>
+        )}
+      </div>
+    </Wrap>
+  );
+}

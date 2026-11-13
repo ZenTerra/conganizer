@@ -2,7 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import type { Table } from 'dexie';
 import { db } from './db';
 import { alive, getSettings, listByCon } from './repo';
-import type { AppSettings, Base, Con } from './types';
+import type { AppSettings, Base, Con, Trip } from './types';
 
 export function useCons(): Con[] | undefined {
   return useLiveQuery(async () => alive(await db.cons.toArray()), []);
@@ -26,4 +26,8 @@ export function useConRecords<T extends Base & { conId: string }>(
 
 export function useSettings(): AppSettings | undefined {
   return useLiveQuery(() => getSettings(), []);
+}
+
+export function useAllTrips(): Trip[] | undefined {
+  return useLiveQuery(async () => alive(await db.trips.toArray()), []);
 }

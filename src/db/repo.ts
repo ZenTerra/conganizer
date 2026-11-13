@@ -6,9 +6,11 @@
 import type { Table } from 'dexie';
 import { CHILD_TABLES, db } from './db';
 import { DEFAULT_SETTINGS } from './templates';
+import { conDays } from '../domain/dates';
 import type {
   AppSettings,
   Base,
+  CashDay,
   ChecklistItem,
   Con,
   NewRecord,
@@ -136,4 +138,62 @@ export async function deleteCon(conId: string): Promise<void> {
     }
     await deleteRecord(db.cons, conId);
   });
+}
+
+// ---------------------------------------------------------------- Tage mit deterministischer ID
+
+export const cashDayId = (conId: string, date: string): string => `${conId}_cash_${date}`;
+export const dailyItemId = (conId: string, date: string, index: number): string => `${conId}_tag_${date}_${index}`;
+
+/**
+ * Fügt nur Datensätze hinzu, deren ID noch nicht existiert. Auch Tombstones zählen als
+ * vorhanden – gelöschte Tage/Punkte werden also nicht wiederbelebt.
+ */
+export async function addMissing<T extends Base>(table: Table<T, string>, records: T[]): Promise<number> {
+  if (records.length === 0) return 0;
+  return db.transaction('rw', table, async () => {
+    const existing = await table.bulkGet(records.map((r) => r.id));
+    const missing = records.filter((_, i) => !existing[i]);
+    if (missing.length) await table.bulkAdd(missing);
+    return missing.length;
+  });
+}
+
+/** Legt für jeden Con-Tag einen (leeren) Kassentag an, falls noch keiner existiert. */
+export async function ensureCashDays(con: Pick<Con, 'id' | 'startDate' | 'endDate'>): Promise<number> {
+  const ts = now();
+  const days: CashDay[] = conDays(con.startDate, con.endDate).map((date) => ({
+    id: cashDayId(con.id, date),
+    updatedAt: ts,
+    deleted: 0,
+    conId: con.id,
+    date,
+    movements: [],
+    transferred: false,
+  }));
+  return addMissing(db.cashDays, days);
+}
+
+/** Legt die Tagespunkte der Checkliste für jeden Con-Tag aus der Vorlage an. */
+export async function ensureDailyChecklist(
+  con: Pick<Con, 'id' | 'startDate' | 'endDate'>,
+  settings: Pick<AppSettings, 'checklistTemplate'>,
+): Promise<number> {
+  const ts = now();
+  const template = settings.checklistTemplate.filter((t) => t.section === 'tag');
+  const items: ChecklistItem[] = conDays(con.startDate, con.endDate).flatMap((date) =>
+    template.map((t, i) => ({
+      id: dailyItemId(con.id, date, i),
+      updatedAt: ts,
+      deleted: 0 as const,
+      conId: con.id,
+      section: 'tag' as const,
+      date,
+      label: t.label,
+      auto: t.auto,
+      checked: false,
+      order: i,
+    })),
+  );
+  return addMissing(db.checklistItems, items);
 }

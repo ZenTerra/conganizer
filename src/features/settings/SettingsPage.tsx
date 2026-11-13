@@ -7,6 +7,7 @@ import { setSetting } from '../../db/repo';
 import type { AppSettings } from '../../db/types';
 import { MoneyField, TextField } from '../../ui/fields';
 import { Toast } from '../../ui/common';
+import { ChecklistTemplateEditor, PackTemplateEditor } from './TemplateEditor';
 
 type Editable = Pick<AppSettings, 'homeAddress' | 'kmRate' | 'mealRatePartial' | 'mealRateFull'>;
 
@@ -89,6 +90,16 @@ export function SettingsPage() {
         <button className="btn primary block" onClick={save}>
           Speichern
         </button>
+
+        {settings && (
+          <>
+            <PackTemplateEditor initial={settings.packTemplate} onSaved={() => setToast('Packlisten-Vorlage gespeichert')} />
+            <ChecklistTemplateEditor
+              initial={settings.checklistTemplate}
+              onSaved={() => setToast('Checklisten-Vorlage gespeichert')}
+            />
+          </>
+        )}
 
         <section className="card">
           <h2>Daten</h2>
